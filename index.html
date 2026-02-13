@@ -192,15 +192,15 @@ function createHeartFirework(x) {
     const launchY = canvas.height * (0.2 + Math.random()*0.3);
     fireworkLaunchSound.currentTime=0; fireworkLaunchSound.play().catch(()=>{});
     const color = ['#ff4b5c','#ffdd57','#ff6f61','#ff85a2','#ff9a9e'][Math.floor(Math.random()*5)];
-    const num = 80;
+    const num = 100; // more particles for bigger effect
     for(let i=0; i<num; i++){
         const t = Math.random()*Math.PI*2;
         const scale = 18 + Math.random()*4;
         const hx = 16*Math.pow(Math.sin(t),3) * scale;
         const hy = -(13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) * scale;
-        const vx = hx*0.06 + (Math.random()-0.5)*1.5;
-        const vy = hy*0.06 + (Math.random()-0.5)*1.5;
-        particles.push(new Particle(x, launchY, vx, vy, color, 800, 6 + Math.random()*2)); // life 300 frames
+        const vx = hx*0.05 + (Math.random()-0.5)*1.2; // slower explosion
+        const vy = hy*0.05 + (Math.random()-0.5)*1.2;
+        particles.push(new Particle(x, launchY, vx, vy, color, 420, 6 + Math.random()*2)); // lasts longer
     }
     fireworkSound.currentTime=0; fireworkSound.play().catch(()=>{});
 }
@@ -223,16 +223,22 @@ function animate() {
 }
 animate();
 
-// --- Yes button ---
 yesBtn.addEventListener('click', ()=>{
     const rect = yesBtn.getBoundingClientRect();
     const centerX = rect.left + rect.width/2;
     const centerY = rect.top + rect.height/2;
     createHearts(centerX, centerY);
-    createHeartFirework(Math.random()*canvas.width, canvas.height); // random firework from bottom
-    createHeartFirework(Math.random()*canvas.width, canvas.height);
-    createHeartFirework(Math.random()*canvas.width, canvas.height);
+
+    // Fireworks over 8 seconds
+    let count = 0;
+    const maxCount = 4; // 3-4 fireworks
+    const interval = setInterval(()=>{
+        createHeartFirework(Math.random()*canvas.width);
+        count++;
+        if(count >= maxCount) clearInterval(interval);
+    }, 2000); // every 2 seconds
 });
+
 </script>
 </body>
 </html>
