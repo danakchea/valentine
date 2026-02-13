@@ -203,6 +203,16 @@ function createHearts(centerX, centerY) {
     }
 }
 
+// Unlock sounds for mobile
+function unlockAudio() {
+    [heartSound, fireworkSound, fireworkLaunchSound].forEach(audio => {
+        audio.play().then(() => audio.pause()).catch(()=>{});
+        audio.currentTime = 0;
+    });
+    window.removeEventListener('touchstart', unlockAudio);
+}
+window.addEventListener('touchstart', unlockAudio, {once: true});
+
 // --- Canvas Fireworks ---
 class Particle {
     constructor(x, y, vx, vy, color, life, radius=6) {
