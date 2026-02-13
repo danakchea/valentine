@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Valentine Celebration 💖</title>
+    <title>Valentine Fireworks & Hearts 💖</title>
     <style>
         body {
             margin: 0;
@@ -20,7 +20,7 @@
             background-color: white;
             padding: 40px 60px;
             border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
             z-index: 10;
         }
 
@@ -42,15 +42,8 @@
             z-index: 1;
         }
 
-        .yes {
-            background-color: #ff4b5c;
-            color: white;
-        }
-
-        .no {
-            background-color: #ff6f61;
-            color: white;
-        }
+        .yes { background-color: #ff4b5c; color: white; }
+        .no { background-color: #ff6f61; color: white; }
 
         #message {
             margin-top: 20px;
@@ -71,12 +64,8 @@
             75% { transform: rotate(5deg); }
             100% { transform: rotate(0deg); }
         }
+        .wiggle { animation: wiggle 0.5s ease; }
 
-        .wiggle {
-            animation: wiggle 0.5s ease;
-        }
-
-        /* Heart styling */
         .heart {
             position: absolute;
             width: 20px;
@@ -85,32 +74,20 @@
             transform: rotate(-45deg);
             pointer-events: none;
         }
-
-        .heart::before,
-        .heart::after {
-            content: "";
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #ff4b5c;
-            border-radius: 50%;
+        .heart::before, .heart::after {
+            content:"";
+            position:absolute;
+            width:20px; height:20px;
+            background-color:#ff4b5c;
+            border-radius:50%;
         }
+        .heart::before { top:-10px; left:0; }
+        .heart::after { left:10px; top:0; }
 
-        .heart::before {
-            top: -10px;
-            left: 0;
-        }
-
-        .heart::after {
-            left: 10px;
-            top: 0;
-        }
-
-        /* Firework particle */
         .particle {
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             pointer-events: none;
         }
@@ -145,7 +122,11 @@ const loveQuotes = [
     "💟 No distance can lessen my love for you."
 ];
 
-// --- No button movement & message ---
+// --- Sounds ---
+const heartSound = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YYQAAAAA"); // simple pop
+const fireworkSound = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA"); // placeholder pop
+
+// --- No button ---
 function moveButton() {
     noBtn.style.position = "fixed";
     const maxX = window.innerWidth - noBtn.offsetWidth;
@@ -160,62 +141,78 @@ function moveButton() {
     const quote = loveQuotes[Math.floor(Math.random() * loveQuotes.length)];
     message.style.opacity = 0;
     message.textContent = quote;
-    setTimeout(() => { message.style.opacity = 1; }, 50);
+    setTimeout(()=>{ message.style.opacity = 1; },50);
 }
-
 noBtn.addEventListener("mouseover", moveButton);
 
-// --- Yes click: hearts spiral + spinning + full screen fireworks ---
+// --- Yes click: hearts + fireworks with trails & sounds ---
 function createHeartsAndFireworks() {
     const rect = yesBtn.getBoundingClientRect();
     const centerX = rect.left + rect.width/2;
     const centerY = rect.top + rect.height/2;
 
-    // --- Hearts floating in spiral ---
+    // Hearts
     for(let i=0;i<20;i++){
         const heart = document.createElement('div');
-        heart.className = 'heart';
+        heart.className='heart';
         document.body.appendChild(heart);
-        heart.style.left = centerX + 'px';
-        heart.style.top = centerY + 'px';
-
-        const angleOffset = i * 20 * Math.PI/180;
-        const radius = 20 + i*10;
-        const duration = 2000 + Math.random()*1000;
-        const rotateDeg = 360 + Math.random()*360;
-
+        heart.style.left=centerX+'px';
+        heart.style.top=centerY+'px';
+        const angleOffset=i*20*Math.PI/180;
+        const radius=20+i*10;
+        const duration=2000+Math.random()*1000;
+        const rotateDeg=360+Math.random()*360;
         heart.animate([
             { transform: `translate(0,0) rotate(0deg)`, opacity:1 },
-            { transform: `translate(${Math.cos(angleOffset)*radius}px, ${-200 - radius}px) rotate(${rotateDeg}deg)`, opacity:0 }
+            { transform: `translate(${Math.cos(angleOffset)*radius}px, ${-200-radius}px) rotate(${rotateDeg}deg)`, opacity:0 }
         ], { duration: duration, easing:'ease-out' });
-
         setTimeout(()=> heart.remove(), duration);
+        // Play heart pop
+        heartSound.currentTime=0;
+        heartSound.play().catch(()=>{});
     }
 
-    // --- Full screen fireworks ---
-    const colors = ["#ff4b5c","#ffdd57","#ff6f61","#ff85a2","#ff9a9e"];
-    for(let i=0;i<50;i++){
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.background = colors[Math.floor(Math.random()*colors.length)];
-        document.body.appendChild(particle);
+    // Fireworks with trails
+    const colors=["#ff4b5c","#ffdd57","#ff6f61","#ff85a2","#ff9a9e"];
+    for(let f=0; f<5; f++){
+        const fx=Math.random()*window.innerWidth;
+        const fy=Math.random()*window.innerHeight/2;
+        const particles=20+Math.floor(Math.random()*15);
 
-        // Firework origin anywhere on screen
-        const startX = Math.random()*window.innerWidth;
-        const startY = Math.random()*window.innerHeight/2;
-        particle.style.left = startX + 'px';
-        particle.style.top = startY + 'px';
+        // Play firework sound
+        fireworkSound.currentTime=0;
+        fireworkSound.play().catch(()=>{});
 
-        const angle = Math.random()*Math.PI*2;
-        const distance = 100 + Math.random()*150;
-        const duration = 1000 + Math.random()*500;
-
-        particle.animate([
-            { transform: `translate(0,0)`, opacity:1 },
-            { transform: `translate(${Math.cos(angle)*distance}px, ${Math.sin(angle)*distance}px)`, opacity:0 }
-        ], { duration: duration, easing:'ease-out' });
-
-        setTimeout(()=> particle.remove(), duration);
+        for(let i=0;i<particles;i++){
+            const particle=document.createElement('div');
+            particle.className='particle';
+            particle.style.background=colors[Math.floor(Math.random()*colors.length)];
+            document.body.appendChild(particle);
+            particle.style.left=fx+'px';
+            particle.style.top=fy+'px';
+            const angle=Math.random()*Math.PI*2;
+            const distance=80+Math.random()*150;
+            const duration=1000+Math.random()*500;
+            particle.animate([
+                { transform:`translate(0,0)`, opacity:1 },
+                { transform:`translate(${Math.cos(angle)*distance}px, ${Math.sin(angle)*distance}px)`, opacity:0 }
+            ], { duration:duration, easing:'ease-out' });
+            // trailing sparkle
+            const trail=document.createElement('div');
+            trail.className='particle';
+            trail.style.width='3px';
+            trail.style.height='3px';
+            trail.style.background=particle.style.background;
+            trail.style.left=fx+'px';
+            trail.style.top=fy+'px';
+            document.body.appendChild(trail);
+            trail.animate([
+                { transform:`translate(0,0)`, opacity:0.7 },
+                { transform:`translate(${Math.cos(angle)*distance/2}px, ${Math.sin(angle)*distance/2}px)`, opacity:0 }
+            ], { duration:duration, easing:'ease-out' });
+            setTimeout(()=> trail.remove(), duration);
+            setTimeout(()=> particle.remove(), duration);
+        }
     }
 }
 
