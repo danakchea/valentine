@@ -13,13 +13,14 @@ body {
     align-items: center;
     background: linear-gradient(to right, #ff9a9e, #fad0c4);
 }
-
 canvas {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 0;
+    z-index: 9999; /* front of all elements */
+    pointer-events: none; /* clicks go through canvas */
 }
+
 
 .container {
     text-align: center;
@@ -159,9 +160,8 @@ function createHearts(centerX, centerY) {
     }
 }
 
-// --- Canvas Heart Fireworks ---
 class Particle {
-    constructor(x, y, vx, vy, color, life, radius=3) {
+    constructor(x, y, vx, vy, color, life, radius=5) {
         this.x = x;
         this.y = y;
         this.vx = vx;
@@ -172,10 +172,10 @@ class Particle {
         this.radius = radius;
     }
     update() {
-        this.vy += 0.05; // gravity
+        this.vy += 0.03; // slower gravity
         this.x += this.vx;
         this.y += this.vy;
-        this.opacity -= 0.02;
+        this.opacity -= 0.008; // slower fade
         this.life--;
     }
     draw() {
@@ -187,25 +187,26 @@ class Particle {
     }
 }
 
-
-let particles = [];
-
 function createHeartFirework(x) {
-    const launchY = canvas.height * (0.3 + Math.random()*0.3); // 30%-60% down
+    const launchY = canvas.height * (0.2 + Math.random()*0.3); // 20%-50%
     fireworkLaunchSound.currentTime=0; fireworkLaunchSound.play().catch(()=>{});
     const color = ['#ff4b5c','#ffdd57','#ff6f61','#ff85a2','#ff9a9e'][Math.floor(Math.random()*5)];
-    const num = 80; // more particles
+    const num = 80;
     for(let i=0; i<num; i++){
         const t = Math.random()*Math.PI*2;
-        const scale = 12 + Math.random()*4; // bigger heart shape
+        const scale = 18 + Math.random()*4; // bigger heart
         const hx = 16*Math.pow(Math.sin(t),3) * scale;
         const hy = -(13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) * scale;
-        const vx = hx*0.1 + (Math.random()-0.5)*2;
-        const vy = hy*0.1 + (Math.random()-0.5)*2;
-        particles.push(new Particle(x, launchY, vx, vy, color, 120, 4 + Math.random()*2)); // radius 4-6
+        const vx = hx*0.06 + (Math.random()-0.5)*1.5; // slower
+        const vy = hy*0.06 + (Math.random()-0.5)*1.5;
+        particles.push(new Particle(x, launchY, vx, vy, color, 180, 6 + Math.random()*2)); // lasts longer, radius 6-8
     }
     fireworkSound.currentTime=0; fireworkSound.play().catch(()=>{});
 }
+
+
+
+let particles = [];
 
 
 function animate() {
