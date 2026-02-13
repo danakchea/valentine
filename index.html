@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Catch the No Button 😈</title>
+    <title>Valentine Catch the No Button 😍</title>
     <style>
         body {
             margin: 0;
             height: 100vh;
-            background: linear-gradient(to right, #4facfe, #00f2fe);
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
@@ -38,12 +38,12 @@
         }
 
         .yes {
-            background-color: #28a745;
+            background-color: #ff4b5c;
             color: white;
         }
 
         .no {
-            background-color: #dc3545;
+            background-color: #ff6f61;
             color: white;
         }
 
@@ -59,9 +59,9 @@
 <body>
 
 <div class="container">
-    <h1>Do you like this page?</h1>
+    <h1>Will you be my Valentine?</h1>
     <div class="buttons">
-        <button class="yes" onclick="alert('Yay! 🎉')">Yes</button>
+        <button class="yes" onclick="alert('Yay! 💖 You made my day!')">Yes</button>
         <button class="no" id="noBtn">No</button>
     </div>
     <div id="message"></div>
@@ -71,21 +71,18 @@
     const noBtn = document.getElementById("noBtn");
     const message = document.getElementById("message");
 
-    // Fetch a joke from the API
-    async function fetchJoke() {
-        try {
-            const response = await fetch("https://icanhazdadjoke.com/", {
-                headers: { Accept: "application/json" }
-            });
-            const data = await response.json();
-            return data.joke;
-        } catch (err) {
-            return "Hmm… couldn't get a joke this time 😕";
-        }
-    }
+    const valentineMessages = [
+        "💖 Love is in the air, don’t say No!",
+        "🌹 Aww, choose Yes, my dear!",
+        "💌 No is not an option today 😘",
+        "❤️ Be mine, click Yes!",
+        "💘 Life is sweeter with Yes",
+        "💞 Roses are red, violets are blue, No is scary, Yes loves you!",
+        "💝 Every heart beats for Yes!"
+    ];
 
-    async function moveButton() {
-        // Allow it to float freely after first hover
+    function moveButton() {
+        // Make the No button float freely
         noBtn.style.position = "fixed";
 
         const maxX = window.innerWidth - noBtn.offsetWidth;
@@ -97,9 +94,9 @@
         noBtn.style.left = randomX + "px";
         noBtn.style.top = randomY + "px";
 
-        // Fetch and show a random joke
-        const joke = await fetchJoke();
-        message.textContent = joke;
+        // Show a random Valentine message
+        const randomMsg = valentineMessages[Math.floor(Math.random() * valentineMessages.length)];
+        message.textContent = randomMsg;
     }
 
     noBtn.addEventListener("mouseover", moveButton);
