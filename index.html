@@ -13,14 +13,14 @@ body {
     align-items: center;
     background: linear-gradient(to right, #ff9a9e, #fad0c4);
 }
+
 canvas {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 9999; /* front of all elements */
-    pointer-events: none; /* clicks go through canvas */
+    z-index: 9999; /* fireworks in front */
+    pointer-events: none; /* clicks go through */
 }
-
 
 .container {
     text-align: center;
@@ -60,6 +60,7 @@ button {
     opacity: 0;
     transition: opacity 0.5s ease;
 }
+
 .heart {
     position: absolute;
     width: 20px;
@@ -120,12 +121,12 @@ const loveQuotes = [
     "💟 No distance can lessen my love for you."
 ];
 
-// Real sounds
+// --- Sounds ---
 const heartSound = new Audio("https://www.orangefreesounds.com/wp-content/uploads/2023/04/Firework-crackling-sound-effect.mp3");
 const fireworkSound = new Audio("https://orangefreesounds.com/wp-content/uploads/2024/12/Firework-burst-sound-effect.mp3");
 const fireworkLaunchSound = new Audio("https://www.orangefreesounds.com/wp-content/uploads/2021/12/Firework-audio.mp3");
 
-// --- No button ---
+// --- No button movement ---
 function moveButton() {
     noBtn.style.position = "fixed";
     const maxX = window.innerWidth - noBtn.offsetWidth;
@@ -139,7 +140,7 @@ function moveButton() {
 }
 noBtn.addEventListener("mouseover", moveButton);
 
-// --- Hearts spiral ---
+// --- Hearts floating from button ---
 function createHearts(centerX, centerY) {
     for(let i=0;i<20;i++){
         const heart=document.createElement('div');
@@ -160,6 +161,7 @@ function createHearts(centerX, centerY) {
     }
 }
 
+// --- Canvas Fireworks ---
 class Particle {
     constructor(x, y, vx, vy, color, life, radius=6) {
         this.x = x;
@@ -167,15 +169,15 @@ class Particle {
         this.vx = vx;
         this.vy = vy;
         this.color = color;
-        this.life = life;         // increase this
+        this.life = life;
         this.opacity = 1;
         this.radius = radius;
     }
     update() {
-        this.vy += 0.02;          // slightly slower gravity
+        this.vy += 0.02; // gravity
         this.x += this.vx;
         this.y += this.vy;
-        this.opacity -= 0.004;     // slower fade → stays longer
+        this.opacity -= 0.003; // slow fade
         this.life--;
     }
     draw() {
@@ -187,58 +189,95 @@ class Particle {
     }
 }
 
+let particles = [];
+let rockets = [];
 
-function createHeartFirework(x) {
-    const launchY = canvas.height * (0.2 + Math.random()*0.3);
-    fireworkLaunchSound.currentTime=0; fireworkLaunchSound.play().catch(()=>{});
-    const color = ['#ff4b5c','#ffdd57','#ff6f61','#ff85a2','#ff9a9e'][Math.floor(Math.random()*5)];
-    const num = 100; // more particles for bigger effect
-    for(let i=0; i<num; i++){
-        const t = Math.random()*Math.PI*2;
-        const scale = 18 + Math.random()*4;
-        const hx = 16*Math.pow(Math.sin(t),3) * scale;
-        const hy = -(13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) * scale;
-        const vx = hx*0.05 + (Math.random()-0.5)*1.2; // slower explosion
-        const vy = hy*0.05 + (Math.random()-0.5)*1.2;
-        particles.push(new Particle(x, launchY, vx, vy, color, 420, 6 + Math.random()*2)); // lasts longer
+// Rocket class: goes up then explodes
+class Rocket {
+    constructor(x, targetY, color) {
+        this.x = x;
+        this.y = canvas.height;
+        this.targetY = targetY;
+        this.color = color;
+        this.done = false;
     }
-    fireworkSound.currentTime=0; fireworkSound.play().catch(()=>{});
+    update() {
+        this.y -= 4; // move up
+        if(this.y <= this.targetY) {
+            this.explode();
+            this.done = true;
+        }
+    }
+    explode() {
+        const num = 60;
+        const scale = 18;
+        for(let i=0;i<num;i++){
+            const t = Math.random()*Math.PI*2;
+            const hx = 16*Math.pow(Math.sin(t),3) * scale;
+            const hy = -(13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) * scale;
+            const vx = hx*0.05 + (Math.random()-0.5)*1.2;
+            const vy = hy*0.05 + (Math.random()-0.5)*1.2;
+            particles.push(new Particle(this.x, this.y, vx, vy, this.color, 420, 6 + Math.random()*2));
+        }
+        fireworkSound.currentTime=0; fireworkSound.play().catch(()=>{});
+    }
+    draw() {
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 6, 0, Math.PI*2);
+        ctx.fill();
+    }
 }
 
-
-
-
-let particles = [];
-
-
+// Animate rockets and particles
 function animate() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Rockets
+    for(let i=rockets.length-1;i>=0;i--){
+        rockets[i].update();
+        rockets[i].draw();
+        if(rockets[i].done) rockets.splice(i,1);
+    }
+
+    // Particles
     for(let i=particles.length-1;i>=0;i--){
         const p = particles[i];
         p.update();
         p.draw();
         if(p.life <=0 || p.opacity<=0) particles.splice(i,1);
     }
+
     requestAnimationFrame(animate);
 }
 animate();
 
+// Launch a rocket from bottom
+function launchHeartFirework() {
+    const x = Math.random()*canvas.width;
+    const targetY = canvas.height * (0.2 + Math.random()*0.4);
+    const color = ['#ff4b5c','#ffdd57','#ff6f61','#ff85a2','#ff9a9e'][Math.floor(Math.random()*5)];
+    rockets.push(new Rocket(x, targetY, color));
+    fireworkLaunchSound.currentTime=0; fireworkLaunchSound.play().catch(()=>{});
+}
+
+// --- Yes button ---
 yesBtn.addEventListener('click', ()=>{
     const rect = yesBtn.getBoundingClientRect();
     const centerX = rect.left + rect.width/2;
     const centerY = rect.top + rect.height/2;
-    createHearts(centerX, centerY);
 
-    // Fireworks over 8 seconds
+    createHearts(centerX, centerY); // immediate heart pops
+
     let count = 0;
     const maxCount = 4; // 3-4 fireworks
     const interval = setInterval(()=>{
-        createHeartFirework(Math.random()*canvas.width);
+        launchHeartFirework();
         count++;
         if(count >= maxCount) clearInterval(interval);
-    }, 2000); // every 2 seconds
+    }, 2000);
 });
-
 </script>
 </body>
 </html>
