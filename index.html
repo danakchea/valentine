@@ -88,20 +88,20 @@
     const noBtn = document.getElementById("noBtn");
     const message = document.getElementById("message");
 
-    const valentineMessages = [
-        "💖 Love is in the air, don’t say No!",
-        "🌹 Aww, choose Yes, my dear!",
-        "💌 No is not an option today 😘",
-        "❤️ Be mine, click Yes!",
-        "💘 Life is sweeter with Yes",
-        "💞 Roses are red, violets are blue, No is scary, Yes loves you!",
-        "💝 Every heart beats for Yes!",
-        "💓 You can’t escape love 😍",
-        "💕 Happiness is saying Yes!",
-        "💟 No? Not today! 💖"
-    ];
+    // Fetch a random quote from the Quotable API
+    async function fetchQuote() {
+        try {
+            const res = await fetch("https://api.quotable.io/random");
+            const data = await res.json();
+            // format as quote + author
+            return `"${data.content}" — ${data.author}`;
+        } catch (err) {
+            console.error("Fetch failed:", err);
+            return "💘 Love’s in the air… but the quote got shy! 😅";
+        }
+    }
 
-    function moveButton() {
+    async function moveButton() {
         // Move No button
         noBtn.style.position = "fixed";
         const maxX = window.innerWidth - noBtn.offsetWidth;
@@ -116,15 +116,13 @@
         void noBtn.offsetWidth; // force reflow
         noBtn.classList.add("wiggle");
 
-        // Random message
-        const randomMsg = valentineMessages[Math.floor(Math.random() * valentineMessages.length)];
-
-        // Fade-in manually
+        // Fetch and show quote
         message.style.opacity = 0;
-        message.textContent = randomMsg;
+        const quote = await fetchQuote();
+        message.textContent = quote;
         setTimeout(() => {
             message.style.opacity = 1;
-        }, 50); // small delay to trigger transition
+        }, 50);
     }
 
     noBtn.addEventListener("mouseover", moveButton);
