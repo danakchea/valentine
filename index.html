@@ -22,9 +22,15 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
+        .buttons {
+            display: flex;              /* 🔥 makes them side-by-side */
+            justify-content: center;
+            gap: 20px;                  /* space between buttons */
+            margin-top: 20px;
+        }
+
         button {
             padding: 10px 20px;
-            margin: 10px;
             border: none;
             border-radius: 8px;
             font-size: 16px;
@@ -39,7 +45,6 @@
         .no {
             background-color: #dc3545;
             color: white;
-            position: fixed; /* 🔥 KEY FIX */
         }
     </style>
 </head>
@@ -47,15 +52,19 @@
 
 <div class="container">
     <h1>Do you like this page?</h1>
-    <button class="yes" onclick="alert('Yay! 🎉')">Yes</button>
+    <div class="buttons">
+        <button class="yes" onclick="alert('Yay! 🎉')">Yes</button>
+        <button class="no" id="noBtn">No</button>
+    </div>
 </div>
-
-<button class="no" id="noBtn">No</button>
 
 <script>
     const noBtn = document.getElementById("noBtn");
 
     function moveButton() {
+        // Change to fixed AFTER first hover
+        noBtn.style.position = "fixed";
+
         const maxX = window.innerWidth - noBtn.offsetWidth;
         const maxY = window.innerHeight - noBtn.offsetHeight;
 
