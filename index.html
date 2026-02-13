@@ -81,6 +81,10 @@ button {
 
 #thankYouBtn {
     display: none;
+    position: fixed; /* absolute relative to viewport */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     padding: 12px 24px;
     font-size: 18px;
     background-color: #ff4b5c;
@@ -90,6 +94,7 @@ button {
     cursor: pointer;
     z-index: 20;
 }
+
 </style>
 </head>
 <body>
@@ -132,8 +137,8 @@ const maxParticles = isMobile ? 15 : 40;
 const rocketsAtOnce = isMobile ? 2 : 5;
 const heartsAtOnce = isMobile ? 6 : 15;
 
-// --- No button movement ---
-const loveQuotes = [
+// --- Love quotes ---
+let loveQuotes = [
     "😠 Oun ang ot slanh b eh man?",
     "💢 Tov bach reh.",
     "😡 Het ter ke.",
@@ -146,18 +151,37 @@ const loveQuotes = [
     "😩 Tlerm thom ah neh"
 ];
 
+// Shuffle function
+function shuffle(array) {
+    for(let i = array.length -1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Create a queue of quotes
+let quoteQueue = shuffle([...loveQuotes]);
+
+// --- No button movement ---
 function moveButton() {
     noBtn.style.position = "fixed";
     const maxX = window.innerWidth - noBtn.offsetWidth;
     const maxY = window.innerHeight - noBtn.offsetHeight;
     noBtn.style.left = Math.random()*maxX + "px";
     noBtn.style.top = Math.random()*maxY + "px";
-    const quote = loveQuotes[Math.floor(Math.random()*loveQuotes.length)];
-    message.style.opacity=0;
-    message.textContent=quote;
-    setTimeout(()=>message.style.opacity=1,50);
+
+    // Take next quote from queue
+    if(quoteQueue.length === 0) quoteQueue = shuffle([...loveQuotes]); // reshuffle if empty
+    const quote = quoteQueue.shift();
+
+    message.style.opacity = 0;
+    message.textContent = quote;
+    setTimeout(()=> message.style.opacity = 1, 50);
 }
+
 noBtn.addEventListener("mouseover", moveButton);
+
 
 // --- Hearts floating ---
 function createHearts(centerX, centerY) {
