@@ -2,9 +2,40 @@
 <html>
 <head>
     <title>Hello World Page</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello, World!</h1>
-    <p>This is my first HTML page.</p>
+    <div class="container">
+        <h1>Hello, World!</h1>
+        <p>This is my styled HTML page.</p>
+    </div>
 </body>
 </html>
