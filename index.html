@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Valentine Quotes Escape 😍</title>
+    <title>Valentine Escape 😍</title>
     <style>
         body {
             margin: 0;
@@ -53,6 +53,15 @@
             color: #333;
             min-height: 24px;
             max-width: 400px;
+
+            /* Add transition for smooth fade */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Class to show the message */
+        .show {
+            opacity: 1;
         }
     </style>
 </head>
@@ -71,18 +80,21 @@
     const noBtn = document.getElementById("noBtn");
     const message = document.getElementById("message");
 
-    // Fetch a random quote from the Quotable API
-    async function fetchRandomQuote() {
-        try {
-            const response = await fetch("https://api.quotable.io/random");
-            const data = await response.json();
-            return `"${data.content}" — ${data.author}`;
-        } catch (err) {
-            return "💘 Love’s in the air… but the quote got shy! 😅";
-        }
-    }
+    const valentineMessages = [
+        "💖 Love is in the air, don’t say No!",
+        "🌹 Aww, choose Yes, my dear!",
+        "💌 No is not an option today 😘",
+        "❤️ Be mine, click Yes!",
+        "💘 Life is sweeter with Yes",
+        "💞 Roses are red, violets are blue, No is scary, Yes loves you!",
+        "💝 Every heart beats for Yes!",
+        "💓 You can’t escape love 😍",
+        "💕 Happiness is saying Yes!",
+        "💟 No? Not today! 💖"
+    ];
 
-    async function moveButton() {
+    function moveButton() {
+        // Make the No button float freely
         noBtn.style.position = "fixed";
 
         const maxX = window.innerWidth - noBtn.offsetWidth;
@@ -94,9 +106,15 @@
         noBtn.style.left = randomX + "px";
         noBtn.style.top = randomY + "px";
 
-        // Fetch and show a live quote
-        const quote = await fetchRandomQuote();
-        message.textContent = quote;
+        // Pick a random message
+        const randomMsg = valentineMessages[Math.floor(Math.random() * valentineMessages.length)];
+
+        // Fade out first
+        message.classList.remove("show");
+        setTimeout(() => {
+            message.textContent = randomMsg;
+            message.classList.add("show");
+        }, 200); // small delay to allow fade-out
     }
 
     noBtn.addEventListener("mouseover", moveButton);
