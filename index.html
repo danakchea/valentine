@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Be my Valentine 2026? 💖</title>
+<title>Be my valentine 2026? 💖</title>
 <style>
 body {
     margin: 0;
@@ -24,10 +24,10 @@ canvas {
 
 .container {
     text-align: center;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.9);
     padding: 40px 60px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
     z-index: 10;
     position: relative;
 }
@@ -40,12 +40,16 @@ canvas {
 }
 
 button {
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 16px;
     cursor: pointer;
     position: relative;
+    transition: transform 0.2s;
+}
+button:active {
+    transform: scale(0.95);
 }
 
 .yes { background-color: #ff4b5c; color: white; }
@@ -79,22 +83,31 @@ button {
 .heart::before { top:-10px; left:0; }
 .heart::after { left:10px; top:0; }
 
+/* Final Muah button */
 #thankYouBtn {
     display: none;
-    position: fixed; /* absolute relative to viewport */
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 12px 24px;
-    font-size: 18px;
+    padding: 20px 40px;
+    font-size: 24px;
     background-color: #ff4b5c;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 30px;
     cursor: pointer;
     z-index: 20;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
 }
 
+/* Responsive font size for mobile */
+@media (max-width: 600px) {
+    .container { padding: 30px 20px; }
+    button { font-size: 18px; padding: 14px 28px; }
+    #thankYouBtn { font-size: 28px; padding: 24px 48px; }
+    #message { font-size: 18px; }
+}
 </style>
 </head>
 <body>
@@ -129,15 +142,6 @@ const buttonsDiv = document.getElementById("buttonsDiv");
 const question = document.getElementById("question");
 const thankYouBtn = document.getElementById("thankYouBtn");
 
-// Determine if mobile
-const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-
-// Optimize numbers based on device
-const maxParticles = isMobile ? 15 : 40;
-const rocketsAtOnce = isMobile ? 2 : 5;
-const heartsAtOnce = isMobile ? 6 : 15;
-
-// --- Love quotes ---
 let loveQuotes = [
     "😠 Oun ang ot slanh b eh man?",
     "💢 Tov bach reh.",
@@ -151,7 +155,7 @@ let loveQuotes = [
     "😩 Tlerm thom ah neh"
 ];
 
-// Shuffle function
+// Shuffle quotes to avoid repeats
 function shuffle(array) {
     for(let i = array.length -1; i > 0; i--){
         const j = Math.floor(Math.random() * (i + 1));
@@ -159,8 +163,6 @@ function shuffle(array) {
     }
     return array;
 }
-
-// Create a queue of quotes
 let quoteQueue = shuffle([...loveQuotes]);
 
 // --- No button movement ---
@@ -171,21 +173,18 @@ function moveButton() {
     noBtn.style.left = Math.random()*maxX + "px";
     noBtn.style.top = Math.random()*maxY + "px";
 
-    // Take next quote from queue
-    if(quoteQueue.length === 0) quoteQueue = shuffle([...loveQuotes]); // reshuffle if empty
+    if(quoteQueue.length === 0) quoteQueue = shuffle([...loveQuotes]);
     const quote = quoteQueue.shift();
 
     message.style.opacity = 0;
     message.textContent = quote;
-    setTimeout(()=> message.style.opacity = 1, 50);
+    setTimeout(()=> message.style.opacity = 1,50);
 }
-
 noBtn.addEventListener("mouseover", moveButton);
-
 
 // --- Hearts floating ---
 function createHearts(centerX, centerY) {
-    for(let i=0;i<heartsAtOnce;i++){
+    for(let i=0;i<15;i++){
         const heart=document.createElement('div');
         heart.className='heart';
         document.body.appendChild(heart);
@@ -203,46 +202,36 @@ function createHearts(centerX, centerY) {
     }
 }
 
-// Unlock sounds for mobile
-function unlockAudio() {
-    [heartSound, fireworkSound, fireworkLaunchSound].forEach(audio => {
-        audio.play().then(() => audio.pause()).catch(()=>{});
-        audio.currentTime = 0;
-    });
-    window.removeEventListener('touchstart', unlockAudio);
-}
-window.addEventListener('touchstart', unlockAudio, {once: true});
-
-// --- Canvas Fireworks ---
+// --- Fireworks ---
 class Particle {
-    constructor(x, y, vx, vy, color, life, radius=6) {
-        this.x = x; this.y = y; this.vx = vx; this.vy = vy;
-        this.color = color; this.life = life; this.opacity = 1; this.radius = radius;
+    constructor(x,y,vx,vy,color,life,radius=6){
+        this.x=x; this.y=y; this.vx=vx; this.vy=vy; this.color=color; this.life=life; this.opacity=1; this.radius=radius;
     }
-    update() { this.vy += 0.02; this.x += this.vx; this.y += this.vy; this.opacity -= 0.003; this.life--; }
-    draw() { ctx.globalAlpha = Math.max(this.opacity,0); ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x,this.y,this.radius,0,Math.PI*2); ctx.fill(); }
+    update(){ this.vy += 0.02; this.x += this.vx; this.y += this.vy; this.opacity -=0.003; this.life--; }
+    draw(){ ctx.globalAlpha=Math.max(this.opacity,0); ctx.fillStyle=this.color; ctx.beginPath(); ctx.arc(this.x,this.y,this.radius,0,Math.PI*2); ctx.fill(); }
 }
 
-let particles = [];
-let rockets = [];
+let particles=[]; 
+let rockets=[];
 
 class Rocket {
-    constructor(x, targetY, color) {
-        this.x = x; this.y = canvas.height; this.targetY = targetY; this.color = color; this.done=false; this.size=40; this.trail=[];
+    constructor(x,targetY,color){
+        this.x=x; this.y=canvas.height; this.targetY=targetY; this.color=color; this.done=false; this.size=40; this.trail=[];
     }
-    update() {
+    update(){
         this.trail.push({x:this.x, y:this.y});
-        if(this.trail.length>(isMobile?8:15)) this.trail.shift();
-        this.y -= 8;
-        if(this.y <= this.targetY) { this.explode(); this.done=true; }
+        if(this.trail.length>15) this.trail.shift();
+        this.y -=8;
+        if(this.y <= this.targetY){ this.explode(); this.done=true; }
     }
-    draw() {
+    draw(){
         ctx.strokeStyle=this.color; ctx.lineWidth=2; ctx.beginPath();
         for(let i=0;i<this.trail.length-1;i++){
             const p1=this.trail[i], p2=this.trail[i+1];
             ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y);
         }
         ctx.stroke();
+        // draw heart rocket
         ctx.fillStyle=this.color; ctx.beginPath();
         const topCurveHeight=this.size*0.3;
         ctx.moveTo(this.x,this.y+topCurveHeight);
@@ -252,20 +241,20 @@ class Rocket {
         ctx.bezierCurveTo(this.x+this.size/2,this.y,this.x,this.y,this.x,this.y+topCurveHeight);
         ctx.closePath(); ctx.fill();
     }
-    explode() {
-        for(let i=0;i<maxParticles;i++){
+    explode(){
+        const num=40; const scale=18;
+        for(let i=0;i<num;i++){
             const t=Math.random()*Math.PI*2;
-            const scale= isMobile?10:18;
             const hx=16*Math.pow(Math.sin(t),3)*scale;
             const hy=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))*scale;
             const vx=hx*0.05+(Math.random()-0.5)*1.0;
             const vy=hy*0.05+(Math.random()-0.5)*1.0;
-            particles.push(new Particle(this.x,this.y,vx,vy,this.color,200,4+Math.random()*2));
+            particles.push(new Particle(this.x,this.y,vx,vy,this.color,400,6+Math.random()*2));
         }
     }
 }
 
-function animate() {
+function animate(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     for(let i=rockets.length-1;i>=0;i--){ rockets[i].update(); rockets[i].draw(); if(rockets[i].done) rockets.splice(i,1); }
     for(let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.update(); p.draw(); if(p.life<=0||p.opacity<=0) particles.splice(i,1); }
@@ -273,10 +262,10 @@ function animate() {
 }
 animate();
 
-function launchHeartFirework() {
-    const x = Math.random()*canvas.width;
-    const targetY = canvas.height*(0.2+Math.random()*0.4);
-    const color = ['#ff4b5c','#ffdd57','#ff6f61','#ff85a2','#ff9a9e'][Math.floor(Math.random()*5)];
+function launchHeartFirework(){
+    const x=Math.random()*canvas.width;
+    const targetY=canvas.height*(0.2+Math.random()*0.4);
+    const color=['#ff4b5c','#ffdd57','#ff6f61','#ff85a2','#ff9a9e'][Math.floor(Math.random()*5)];
     rockets.push(new Rocket(x,targetY,color));
 }
 
@@ -288,19 +277,20 @@ yesBtn.addEventListener('click', ()=>{
 
     buttonsDiv.style.display="none";
     question.style.display="none";
-    message.style.opacity=0;
+    message.style.opacity = 0;
+
     message.textContent="Slanh tuy mai ai.";
-    setTimeout(()=>message.style.opacity=1,50);
+    setTimeout(()=> message.style.opacity = 1,50);
 
     createHearts(centerX, centerY);
 
-    for(let i=0;i<rocketsAtOnce;i++) setTimeout(()=>launchHeartFirework(), i*30);
+    for(let i=0;i<5;i++) setTimeout(()=>launchHeartFirework(), i*30);
 
-    let elapsed = 0;
-    const duration = 8000;
-    const intervalTime = 1000;
-    const interval = setInterval(()=>{
-        for(let i=0;i<rocketsAtOnce;i++) setTimeout(()=>launchHeartFirework(), i*30);
+    let elapsed=0;
+    const duration=8000;
+    const intervalTime=1000;
+    const interval=setInterval(()=>{
+        for(let i=0;i<5;i++) setTimeout(()=>launchHeartFirework(), i*30);
         elapsed += intervalTime;
         if(elapsed >= duration){
             clearInterval(interval);
