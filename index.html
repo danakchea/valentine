@@ -23,9 +23,9 @@
         }
 
         .buttons {
-            display: flex;              /* 🔥 makes them side-by-side */
+            display: flex;
             justify-content: center;
-            gap: 20px;                  /* space between buttons */
+            gap: 20px;
             margin-top: 20px;
         }
 
@@ -46,6 +46,13 @@
             background-color: #dc3545;
             color: white;
         }
+
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #333;
+            min-height: 24px;
+        }
     </style>
 </head>
 <body>
@@ -56,13 +63,25 @@
         <button class="yes" onclick="alert('Yay! 🎉')">Yes</button>
         <button class="no" id="noBtn">No</button>
     </div>
+    <div id="message"></div>
 </div>
 
 <script>
     const noBtn = document.getElementById("noBtn");
+    const message = document.getElementById("message");
+
+    const funnyTexts = [
+        "Hey! Don’t click No 😤",
+        "That’s illegal 🚨",
+        "Nice try 😂",
+        "No is not an option 😌",
+        "Stop chasing me 😭",
+        "You really want to click that? 🤨",
+        "Absolutely not 😎"
+    ];
 
     function moveButton() {
-        // Change to fixed AFTER first hover
+        // Make it float freely after first hover
         noBtn.style.position = "fixed";
 
         const maxX = window.innerWidth - noBtn.offsetWidth;
@@ -73,6 +92,10 @@
 
         noBtn.style.left = randomX + "px";
         noBtn.style.top = randomY + "px";
+
+        // Show random funny message
+        const randomText = funnyTexts[Math.floor(Math.random() * funnyTexts.length)];
+        message.textContent = randomText;
     }
 
     noBtn.addEventListener("mouseover", moveButton);
